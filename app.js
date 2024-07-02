@@ -9,6 +9,9 @@ const productsDOM = document.querySelector(".products-center");
 import { productsData } from "./products.js";
 
 
+const cart = []; 
+
+
 //1. get products 
 
 class Products{
@@ -38,10 +41,34 @@ class UI{
             productsDOM.innerHTML = result; 
     });
   }
+
+  getAddToCartBtns(){
+    const addTocartBtns = document.querySelectorAll(".add-to-cart"); 
+    const buttons = [...addTocartBtns]; 
+
+
+    buttons.forEach(btn => {
+      const id = btn.dataset.id; 
+
+      //check if this products id is in cart or not
+      const isInCart = cart.find(p => p.id == id); 
+      if (isInCart){
+        btn.innerText = 'in Cart'; 
+        btn.ariaDisabled = true; 
+      }
+
+      btn.addEventListener('click', (event) => {
+        console.log(event.target.dataset.id); 
+        //get product from products 
+        //add to cart
+        //save cart to local storage 
+      }); 
+    }); 
+  }
 }
 
 //3. storage 
-class Straoge{
+class Storage{
   static saveProducts(products){
     localStorage.setItem('products', JSON.stringify(products)); 
   }
@@ -54,9 +81,8 @@ class Straoge{
     const productsData = products.getProducts(); 
     const ui = new UI(); 
     ui.displayProducts(productsData); 
-
+    ui.getAddToCartBtns(); 
     Storage.saveProducts(productsData); 
-    //console.log(productsData); 
   }); 
 
 
