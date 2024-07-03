@@ -8,6 +8,7 @@ const productsDOM = document.querySelector(".products-center");
 const cartTotal = document.querySelector(".cart-total"); 
 const cartItems = document.querySelector(".cart-items"); 
 const cartContent = document.querySelector(".cart-content"); 
+const clearCart = document.querySelector(".clear-cart"); 
 
 
 import { productsData } from "./products.js";
@@ -51,14 +52,13 @@ class UI{
     const buttons = [...addTocartBtns]; 
 
 
-    buttons.forEach(btn => {
+    buttons.forEach((btn) => {
       const id = btn.dataset.id; 
-
       //check if this products id is in cart or not
-      const isInCart = cart.find(p => p.id == id); 
+      const isInCart = cart.find((p) => p.id === parseInt(id)); 
       if (isInCart){
-        btn.innerText = 'in Cart'; 
-        btn.ariaDisabled = true; 
+        btn.innerText = "In Cart"; 
+        btn.disabled = true; 
       }
 
       btn.addEventListener('click', (event) => {
@@ -90,7 +90,6 @@ class UI{
     }, 0); 
     cartTotal.innerText = `total price: $${totalPrice.toFixed(2)}`;
     cartItems.innerText = tempCartItems; 
-    console.log(tempCartItems); 
   }
   addCartItem(cartItem) {
     const div = document.createElement("div");
@@ -113,7 +112,7 @@ class UI{
   
   setupApp() {
     // Get cart from storage:
-    const cart = Storage.getCart() || [];
+    const cart = Storage.getCart();
     
     // Add each cart item to the UI:
     cart.forEach(cartItem => this.addCartItem(cartItem));
@@ -121,7 +120,22 @@ class UI{
     // Example: Calculate and set total cart value:
     this.setCartValue(cart);
   }
-  
+
+  cartLogic(){
+    //clear cart
+    clearCart.addEventListener("click", () => {
+      //remove (DRY)
+      cart.forEach((cItem) => this.removeItem(cItem.id)); 
+  }); 
+}
+  removeItem(id){
+    //update cart
+    cart = cart.filter((cItem) => cItem.id !== id); 
+    //total price and cart items
+    this.setCartValue(cart); 
+    //update storage:
+    Storage.saveCart(cart); 
+  }
 }
 
 
@@ -138,11 +152,13 @@ class Storage{
   static saveCart(cart){
     localStorage.setItem("cart", JSON.stringify(cart)); 
   }
-  static getCart(){
-    return JSON.parse(localStorage.getItem("cart")); 
-  }
+  static getCart() {
+    return JSON.parse(localStorage.getItem("cart")) 
+           ? JSON.parse(localStorage.getItem("cart")) 
+           : [];
 }
-  
+
+  } 
 
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -153,6 +169,7 @@ class Storage{
     ui.setupApp(); 
     ui.displayProducts(productsData); 
     ui.getAddToCartBtns(); 
+    ui.cartLogic(); 
     Storage.saveProducts(productsData); 
   }); 
 
