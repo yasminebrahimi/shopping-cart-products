@@ -239,6 +239,11 @@ body {
   margin-right: 10px;
 }
 
+
+.far fa-trash-alt {
+  cursor: pointer;
+}
+
 @media (max-width: 600px) {
   .cart {
     left: 5% !important;
@@ -247,3 +252,7 @@ body {
     padding: 0;
   }
 }
+
+
+
+

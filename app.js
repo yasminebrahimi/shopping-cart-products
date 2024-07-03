@@ -7,6 +7,7 @@ const closeModel = document.querySelector(".cart-item-confirm");
 const productsDOM = document.querySelector(".products-center"); 
 const cartTotal = document.querySelector(".cart-total"); 
 const cartItems = document.querySelector(".cart-items"); 
+const cartContent = document.querySelector(".cart-content"); 
 
 
 import { productsData } from "./products.js";
@@ -16,7 +17,6 @@ let cart = [];
 
 
 //1. get products 
-
 class Products{
 
   //get from api and pint
@@ -24,6 +24,7 @@ class Products{
    return productsData; 
 }
 }
+
 //2. display products
 class UI{
   displayProducts(products){
@@ -64,16 +65,17 @@ class UI{
        event.target.innerText = "In cart"; 
        event.target.disabled = true; 
         //get product from products 
-        const addedProduct = Storage.getProduct(id); 
+        const addedProduct = {...Storage.getProduct(id), quantity: 1}; 
         //add to cart
         console.log(addedProduct); 
-        cart = [...cart, {...addedProduct, quantity: 1}]; 
+        cart = [...cart, addedProduct]; 
         //save cart to local storage 
         Storage.saveCart(cart); 
         //update cart value
         this.setCartValue(cart); 
         //add to cart item 
-        //
+        this.addCartItem(addedProduct); 
+        //get cart from storage
       }); 
     }); 
   }
@@ -90,6 +92,36 @@ class UI{
     cartItems.innerText = tempCartItems; 
     console.log(tempCartItems); 
   }
+  addCartItem(cartItem) {
+    const div = document.createElement("div");
+    div.classList.add("cart-item");
+    div.innerHTML = `
+      <img class="cart-item-img" src="${cartItem.imageUrl}" />
+      <div class="cart-item-desc">
+        <h4>${cartItem.title}</h4>
+        <h5>$${cartItem.price.toFixed(2)}</h5>
+      </div>
+      <div class="cart-item-controller">
+        <i class="fas fa-chevron-up"></i>
+        <p>${cartItem.quantity}</p>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <i class="far fa-trash-alt"></i>
+    `;
+    cartContent.appendChild(div);
+  }
+  
+  setupApp() {
+    // Get cart from storage:
+    const cart = Storage.getCart() || [];
+    
+    // Add each cart item to the UI:
+    cart.forEach(cartItem => this.addCartItem(cartItem));
+    
+    // Example: Calculate and set total cart value:
+    this.setCartValue(cart);
+  }
+  
 }
 
 
@@ -106,6 +138,9 @@ class Storage{
   static saveCart(cart){
     localStorage.setItem("cart", JSON.stringify(cart)); 
   }
+  static getCart(){
+    return JSON.parse(localStorage.getItem("cart")); 
+  }
 }
   
 
@@ -113,7 +148,9 @@ class Storage{
   document.addEventListener("DOMContentLoaded", () => {
     const products = new Products(); 
     const productsData = products.getProducts(); 
+    //set up: get cart and set up application 
     const ui = new UI(); 
+    ui.setupApp(); 
     ui.displayProducts(productsData); 
     ui.getAddToCartBtns(); 
     Storage.saveProducts(productsData); 
