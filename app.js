@@ -5,6 +5,9 @@ const closeModel = document.querySelector(".cart-item-confirm");
 
 
 const productsDOM = document.querySelector(".products-center"); 
+const cartTotal = document.querySelector(".cart-total"); 
+const cartItems = document.querySelector(".cart-items"); 
+
 
 import { productsData } from "./products.js";
 
@@ -68,11 +71,27 @@ class UI{
         //save cart to local storage 
         Storage.saveCart(cart); 
         //update cart value
+        this.setCartValue(cart); 
         //add to cart item 
+        //
       }); 
     }); 
   }
+
+  setCartValue(cart){
+    //1. cart items: 
+    //2. cart total price
+    let tempCartItems = 0; 
+    const totalPrice = cart.reduce((acc, curr) => {
+      tempCartItems += curr.quantity; //2 +1 => 3
+      return acc + curr.quantity * curr.price; 
+    }, 0); 
+    cartTotal.innerText = `total price: $${totalPrice.toFixed(2)}`;
+    cartItems.innerText = tempCartItems; 
+    console.log(tempCartItems); 
+  }
 }
+
 
 //3. storage 
 class Storage{
