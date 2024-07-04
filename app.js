@@ -18,6 +18,7 @@ let cart = [];
 
 
 //1. get products 
+const buttonsDOM = []; 
 class Products{
 
   //get from api and pint
@@ -26,6 +27,7 @@ class Products{
 }
 }
 
+let buttsDOM = [];
 //2. display products
 class UI{
   displayProducts(products){
@@ -48,11 +50,10 @@ class UI{
   }
 
   getAddToCartBtns(){
-    const addTocartBtns = document.querySelectorAll(".add-to-cart"); 
-    const buttons = [...addTocartBtns]; 
-
-
-    buttons.forEach((btn) => {
+    const addTocartBtns = [...document.querySelectorAll(".add-to-cart")]; 
+    buttsDOM = addTocartBtns; 
+      
+    addTocartBtns.forEach((btn) => {
       const id = btn.dataset.id; 
       //check if this products id is in cart or not
       const isInCart = cart.find((p) => p.id === parseInt(id)); 
@@ -101,11 +102,11 @@ class UI{
         <h5>$${cartItem.price.toFixed(2)}</h5>
       </div>
       <div class="cart-item-controller">
-        <i class="fas fa-chevron-up"></i>
+        <i class="fas fa-chevron-up" data-id=${cartItem.id}></i>
         <p>${cartItem.quantity}</p>
-        <i class="fas fa-chevron-down"></i>
+        <i class="fas fa-chevron-down" data-id=${cartItem.id}></i>
       </div>
-      <i class="far fa-trash-alt"></i>
+      <i class="far fa-trash-alt" data-id=${cartItem.id}></i>
     `;
     cartContent.appendChild(div);
   }
@@ -123,11 +124,20 @@ class UI{
 
   cartLogic(){
     //clear cart
-    clearCart.addEventListener("click", () => {
-      //remove (DRY)
-      cart.forEach((cItem) => this.removeItem(cItem.id)); 
-  }); 
+    clearCart.addEventListener("click", () => this.clearCart());  
 }
+
+clearCart(){
+  //remove (DRY)
+  cart.forEach((cItem) => this.removeItem(cItem.id)); 
+  //remove cart content children: 
+  while(cartContent.children.length){
+    cartContent.removeChild(cartContent.children[0]); 
+  }
+  closeModelFunction(); 
+}
+
+
   removeItem(id){
     //update cart
     cart = cart.filter((cItem) => cItem.id !== id); 
@@ -135,6 +145,18 @@ class UI{
     this.setCartValue(cart); 
     //update storage:
     Storage.saveCart(cart); 
+
+    //add get to cart btns => update text and disables 
+    this.getSingleButton(id); 
+
+  }
+
+  getSingleButton(id){
+    const button = buttsDOM.find(
+      (btn) => parseInt(btn.dataset.id) === parseInt(id)
+      ); 
+      button.innerText = "add to cart"; 
+      button.disabled = false; 
   }
 }
 
