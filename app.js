@@ -141,8 +141,35 @@ class UI{
         //3. save cart
         Storage.saveCart(cart); 
         //4. update cart item in UI
-        console.log(addQuantity.nextElementSibling); 
+        //console.log(addQuantity.nextElementSibling); 
         addQuantity.nextElementSibling.innerText = addeditem.quantity; 
+      }
+      else if(event.target.classList.contains("fa-trash-alt")){
+        const removeItem = event.target; 
+        const removedItem = cart.find((c) => c.id == removeItem.dataset.id);
+
+        this.removeItem(_removedItem.id); 
+        Storage.saveCart(cart); 
+        cartContent.removeChild(removeItem.parentElement); 
+        //remove from cartitem 
+        //remove 
+      } else if (event.target.classList.contains("fa-chevron-down")){
+        const subQuantity = event.target; 
+        const substractedItem = cart.find(
+          (c) => c.id == subQuantity.dataset.id
+        ); 
+
+        if(substractedItem.quantity === 1){
+          this.removeItem(substractedItem.id); 
+          cartContent.removeChild(subQuantity.parentElement.parentElement); 
+          return 
+        }
+        substractedItem.quantity--; 
+        this.setCartValue(cart); 
+        //3. save cart
+        Storage.saveCart(cart); 
+        //4. update cart item in UI 
+        subQuantity.previousElementSibling.innerText = substractedItem.quantity; 
       }
     }); 
 }
