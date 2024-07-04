@@ -125,6 +125,26 @@ class UI{
   cartLogic(){
     //clear cart
     clearCart.addEventListener("click", () => this.clearCart());  
+
+    //cart functionality
+    cartContent.addEventListener("click", (event) =>{
+      if (event.target.classList.contains("fa-chevron-up")){
+        console.log(event.target.dataset.id); 
+        const addQuantity = event.target; 
+        //1. get item from cart
+        const addeditem = cart.find(
+          (cItem) => cItem.id == addQuantity.dataset.id
+        );
+        addeditem.quantity++; 
+        //2.  update cart value 
+        this.setCartValue(cart); 
+        //3. save cart
+        Storage.saveCart(cart); 
+        //4. update cart item in UI
+        console.log(addQuantity.nextElementSibling); 
+        addQuantity.nextElementSibling.innerText = addeditem.quantity; 
+      }
+    }); 
 }
 
 clearCart(){
